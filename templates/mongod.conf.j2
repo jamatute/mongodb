@@ -1,0 +1,16 @@
+systemLog:
+  destination: file
+  path: {{ mongod.log_path }}
+  logAppend: true
+  logRotate: reopen
+storage:
+  dbPath: {{ mongod.db_path }}
+  journal:
+    enabled: {{ mongod.journal}}
+processManagement:
+  fork: true
+  pidFilePath: {{ mongod.pid_file }}
+net:
+  port: {{ mongod.port }}
+replication:
+  replSetName: main_replicaset

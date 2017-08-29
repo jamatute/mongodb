@@ -1,0 +1,25 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint:
+  name: yamllint
+platforms:
+  - name: solita_ubuntu_systemd
+    image: solita/ubuntu-systemd
+    privileged: True
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  options:
+    e: force_docker=yes
+scenario:
+  name: solita_ubuntu_systemd_mongodb
+verifier:
+  name: testinfra
+  lint:
+    name: flake8

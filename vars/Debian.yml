@@ -1,0 +1,4 @@
+---
+repository_url: https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/{{ mongod.version }}/x86_64/
+gpg_key_url: https://www.mongodb.org/static/pgp/server-{{ mongod.version }}.asc
+mongodb_packages: mongodb-org

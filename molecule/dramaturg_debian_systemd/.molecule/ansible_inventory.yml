@@ -1,0 +1,11 @@
+# Molecule managed
+
+---
+all:
+  hosts:
+    dramaturg_debian_systemd: &id001
+      ansible_connection: docker
+ungrouped:
+  hosts:
+    dramaturg_debian_systemd: *id001
+  vars: {}

@@ -1,0 +1,11 @@
+---
+# defaults file for mongodb
+mongo_directory: /data/mongod
+mongod:
+  version: 3.4
+  db_path: "{{ mongo_directory }}"
+  log_path: "/var/log/mongodb/mongod.log"
+  pid_file: "{{ mongo_directory }}/mongod.pid"
+  journal: true
+  port: 27017
+  keyfile: /data/security.key

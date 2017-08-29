@@ -1,0 +1,50 @@
+---
+# tasks file for mongodb
+- name: Include vars
+  include_vars: "{{ item }}"
+  with_first_found:
+    - >
+      "{{ ansible_distribution }}-
+      {{ ansible_distribution_major_version | int}}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "default.yml"
+
+- name: Install mongodb repository in Debian
+  include: debian.yml
+  when: ansible_distribution == 'Debian'
+
+- name: Install mongodb repository in Ubuntu
+  include: ubuntu.yml
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Install mongodb repository in CentOS or Redhat
+  include: centos.yml
+  when: >
+    ansible_distribution == 'CentOS' or
+    ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Install mongodb packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ mongodb_packages }}"
+
+- name: Create necessary directories
+  file:
+    path: "{{ mongod.db_path }}"
+    state: directory
+    owner: mongod
+    group: mongod
+    mode: 0770
+
+- name: Initial configuration of mongod
+  template:
+    src: mongod.conf.j2
+    dest: /etc/mongod.conf
+    mode: 0660
+
+  #- name: Start service
+  #  service:
+  #    name: mongod
+  #    state: started

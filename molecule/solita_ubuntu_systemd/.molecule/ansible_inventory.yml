@@ -1,0 +1,11 @@
+# Molecule managed
+
+---
+all:
+  hosts:
+    solita_ubuntu_systemd: &id001
+      ansible_connection: docker
+ungrouped:
+  hosts:
+    solita_ubuntu_systemd: *id001
+  vars: {}
