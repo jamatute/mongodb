@@ -8,4 +8,4 @@
     baseurl: "{{ repository_url }}"
     gpgcheck: 1
     enabled: 1
-    gpgkey: "{{ gpg_key_url }}"
+    gpgkey: "{{ gpg_key.url }}"

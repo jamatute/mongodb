@@ -10,13 +10,9 @@
     - "{{ ansible_os_family }}.yml"
     - "default.yml"
 
-- name: Install mongodb repository in Debian
+- name: Install mongodb repository in Debian or Ubuntu
   include: debian.yml
-  when: ansible_distribution == 'Debian'
-
-- name: Install mongodb repository in Ubuntu
-  include: ubuntu.yml
-  when: ansible_distribution == 'Ubuntu'
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Install mongodb repository in CentOS or Redhat
   include: centos.yml
@@ -44,11 +40,17 @@
   become: yes
   template:
     src: mongod.conf.j2
-    dest: /etc/mongod.conf
-    mode: 0660
+    dest: /etc/mongod.conf2
+    mode: 0640
+
+- name: Enable service
+  become: yes
+  systemd:
+    name: mongod
+    enabled: yes
 
 - name: Start service
   become: yes
   systemd:
     name: mongod
-    enabled: yes
+    state: started
