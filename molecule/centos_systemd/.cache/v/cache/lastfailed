@@ -1,5 +1,5 @@
 {
-  "tests/test_default.py::test_mongod_can_start[ansible://centos_1]": true, 
-  "tests/test_default.py::test_mongod_can_start[ansible://centos_2]": true, 
-  "tests/test_default.py::test_mongod_can_start[ansible://centos_3]": true
+  "tests/test_default.py::test_mongod_conf[ansible://centos_1]": true, 
+  "tests/test_default.py::test_mongod_conf[ansible://centos_2]": true, 
+  "tests/test_default.py::test_mongod_conf[ansible://centos_3]": true
 }

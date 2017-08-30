@@ -12,3 +12,17 @@ def test_hosts_file(host):
     assert f.exists
     assert f.user == 'root'
     assert f.group == 'root'
+
+
+def test_mongod_conf(host):
+    f = host.file('/etc/mongod.conf')
+    assert f.exists
+    assert f.user == 'root'
+    assert f.group == 'root'
+    assert oct(f.mode) == '0640'
+
+
+def test_mongod_can_start(host):
+    f = host.file('/var/log/mongodb/mongod.log')
+    assert f.exists
+    assert f.contains('waiting for connections on port')
