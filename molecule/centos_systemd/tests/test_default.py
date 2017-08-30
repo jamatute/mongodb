@@ -19,7 +19,7 @@ def test_mongod_conf(host):
     assert f.exists
     assert f.user == 'root'
     assert f.group == 'root'
-    assert oct(f.mode) == '0640'
+    assert oct(f.mode) == '0644'
 
 
 def test_mongod_can_start(host):

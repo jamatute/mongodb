@@ -1,0 +1,13 @@
+---
+# tasks for ubuntu
+
+- name: Add repository key
+  apt_key:
+    url: "{{ gpg_key.url }}"
+    id: "{{ gpg_key.id }}"
+    state: present
+
+- name: Add repository
+  apt_repository:
+    repo: deb "{{ repository_url }}" multiverse
+    state: present

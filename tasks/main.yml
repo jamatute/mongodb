@@ -40,8 +40,8 @@
   become: yes
   template:
     src: mongod.conf.j2
-    dest: /etc/mongod.conf2
-    mode: 0640
+    dest: /etc/mongod.conf
+    mode: 0644
 
 - name: Enable service
   become: yes
