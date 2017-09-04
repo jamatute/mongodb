@@ -4,3 +4,4 @@ gpg_key:
   url: hkp://keyserver.ubuntu.com
   id: 0C49F3730359A14518585931BC711F9BA15703C6
 mongodb_packages: mongodb-org
+mongodb_user: mongodb

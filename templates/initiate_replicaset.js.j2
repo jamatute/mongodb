@@ -1,0 +1,14 @@
+config = {
+    _id : "main_replicaset",
+    members : [
+    {% for ip in mongodb_ips %}
+      {% if loop.index == 1 %}
+        {_id : {{ loop.index - 1 }},host: "{{ ip }}:{{mongod.port}}"}
+      {% else %}
+        ,{_id : {{ loop.index - 1 }}, host: "{{ ip }}:{{mongod.port}}"}
+      {% endif %}
+    {% endfor %}
+    ]
+};
+db=db.getSiblingDB("admin");
+db.runCommand({replSetInitiate: config});

@@ -1,0 +1,35 @@
+---
+# tasks file for mongodb_initiate_replicaset
+- name: Fetch docker ips
+  local_action: shell docker inspect --format \{\{.NetworkSettings.IPAddress\}\} {{ inventory_hostname }}
+  register: node_ip
+  changed_when: false
+  when: ansible_connection == "docker"
+
+- name: Save docker ips to a variable
+  set_fact:
+    mongodb_ips: "{{ ansible_play_hosts | map('extract', hostvars, 'node_ip') | map(attribute='stdout') | list }}"
+  run_once: yes
+  when: ansible_connection == "docker"
+
+- name: Save ips to a variable
+  set_fact:
+    mongodb_ips: "{{ ansible_play_hosts | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | join(',') }}"
+  run_once: yes
+  when: ansible_connection != "docker"
+
+- name: Get the ips of the mongo hosts
+  debug:
+    var: mongodb_ips
+    verbosity: 2
+
+- name: Copy the initialization of replicaset script
+  become: yes
+  template:
+    src: initiate_replicaset.js.j2
+    dest: /tmp/replicaset.js
+  run_once: true
+
+- name: Initiate the replicaset
+  command: mongo /tmp/replicaset.js
+  run_once: true

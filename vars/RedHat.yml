@@ -3,3 +3,4 @@ repository_url: https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/{{ m
 gpg_key:
   url: https://www.mongodb.org/static/pgp/server-{{ mongod.version }}.asc
 mongodb_packages: mongodb-org
+mongodb_user: mongod

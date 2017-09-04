@@ -2,6 +2,7 @@
 # tasks file for centos
 
 - name: Add Mongodb repository
+  become: true
   yum_repository:
     name: mongodb
     description: 'Mongodb official repository'

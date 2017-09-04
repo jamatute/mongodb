@@ -1,0 +1,10 @@
+db=db.getSiblingDB('admin'); // Esto hace que cambie a la base de datos admin
+db.createUser({
+                         user:'root',
+                         pwd:"La-Password-Correspondiente",
+                         roles:[ {
+                         db:'admin',
+                         role:'root' }
+ ]
+}
+);

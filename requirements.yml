@@ -1,0 +1,2 @@
+- src: git+git@git.paradigmadigital.com:ansible/add-deb-repo.git
+  branch: develop

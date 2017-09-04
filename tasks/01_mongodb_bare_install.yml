@@ -1,0 +1,57 @@
+---
+# tasks file for mongodb_bare_install
+- name: Include vars
+  include_vars: "{{ item }}"
+  with_first_found:
+    - >
+      "{{ ansible_distribution }}-
+      {{ ansible_distribution_major_version | int}}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "default.yml"
+
+- name: Install mongodb repository in Debian or Ubuntu
+  include_role:
+    name: add-deb-repo
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install mongodb repository in CentOS or Redhat
+  include: centos.yml
+  when: >
+    ansible_distribution == 'CentOS' or
+    ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Install mongodb packages
+  become: yes
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ mongodb_packages }}"
+
+- name: Create necessary directories
+  become: yes
+  file:
+    path: "{{ mongod.db_path }}"
+    state: directory
+    owner: "{{ mongodb_user }}"
+    group: "{{ mongodb_user }}"
+    mode: 0770
+
+- name: Initial configuration of mongod
+  become: yes
+  template:
+    src: mongod.conf.j2
+    dest: /etc/mongod.conf
+    mode: 0644
+
+- name: Enable service
+  become: yes
+  systemd:
+    name: mongod
+    enabled: yes
+
+- name: Start service
+  become: yes
+  systemd:
+    name: mongod
+    state: started
