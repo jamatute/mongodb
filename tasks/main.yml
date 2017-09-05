@@ -3,5 +3,32 @@
 - name: Bare mongodb install
   include: 01_mongodb_bare_install.yml
 
+- name: Test if replicaset exists
+  shell: echo "rs.status()" | mongo --quiet
+  register: replicaset_exists
+  run_once: true
+  retries: 5
+  delay: 10
+  until: replicaset_exists.rc == 0
+  changed_when: false
+
+- name: Debug replicaset
+  debug: var=replicaset_exists
+  run_once: true
+
 - name: Initiate the replicaset
   include: 02_mongodb_initiate_replicaset.yml
+  when: "'NoReplicationEnabled' in replicaset_exists.stdout or
+        'NotYetInitialized' in replicaset_exists.stdout"
+
+# - name: Test if admin user exists
+#   shell: echo "
+#   register: root_user_exists
+#   run_once: true
+#   retries: 5
+#   delay: 10
+#   until: replicaset_exists.rc == 0
+#   changed_when: false
+#
+# - name: Create admin user
+#   include: 03_add_root_user.yml

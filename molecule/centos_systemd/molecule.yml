@@ -28,6 +28,8 @@ provisioner:
   name: ansible
   lint:
     name: ansible-lint
+  options:
+    vv: true
 scenario:
   name: centos_systemd_mongodb
 verifier:
