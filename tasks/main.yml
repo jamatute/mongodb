@@ -12,23 +12,32 @@
   until: replicaset_exists.rc == 0
   changed_when: false
 
-- name: Debug replicaset
-  debug: var=replicaset_exists
+- name: Show replicaset status
+  debug:
+    var: replicaset_exists
+    verbosity: 2
   run_once: true
 
 - name: Initiate the replicaset
   include: 02_mongodb_initiate_replicaset.yml
   when: "'NoReplicationEnabled' in replicaset_exists.stdout or
-        'NotYetInitialized' in replicaset_exists.stdout"
+         'NotYetInitialized' in replicaset_exists.stdout"
 
-# - name: Test if admin user exists
-#   shell: echo "
-#   register: root_user_exists
-#   run_once: true
-#   retries: 5
-#   delay: 10
-#   until: replicaset_exists.rc == 0
-#   changed_when: false
-#
-# - name: Create admin user
-#   include: 03_add_root_user.yml
+- name: Test if admin user exists
+  shell: >
+    echo "db.system.users.find({user:'{{ mongod.admin_user }}'}).count()" |
+    mongo --quiet admin
+  register: root_user_exists
+  run_once: true
+  retries: 5
+  delay: 10
+  until: root_user_exists.rc == 0
+  changed_when: false
+
+- name: Create admin user
+  include: 03_add_root_user.yml
+  run_once: true
+  when: root_user_exists.stdout == '0'
+
+# - name: Add security keyfile
+#   include: 04_add_security_keyfile.yml

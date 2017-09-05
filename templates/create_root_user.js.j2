@@ -1,10 +1,13 @@
-db=db.getSiblingDB('admin'); // Esto hace que cambie a la base de datos admin
-db.createUser({
-                         user:'root',
-                         pwd:"La-Password-Correspondiente",
-                         roles:[ {
-                         db:'admin',
-                         role:'root' }
- ]
-}
+db=db.getSiblingDB('admin');
+db.createUser(
+  {
+    user:'{{ mongod.admin_user | default('root')}}',
+    pwd:"{{ mongod.admin_password }}",
+    roles:[
+      {
+        db:'admin',
+        role:'root'
+      }
+    ]
+  }
 );
