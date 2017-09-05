@@ -3,3 +3,4 @@
 *state.yml
 __pycache__
 roles/
+.cache
