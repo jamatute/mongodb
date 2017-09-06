@@ -41,7 +41,6 @@
     - "{{ mongod.log_path | dirname }}"
     - "{{ mongod.pid_file | dirname }}"
 
-
 - name: Initial configuration of mongod
   become: yes
   template:
@@ -49,14 +48,32 @@
     dest: /etc/mongod.conf
     mode: 0644
 
+# - name: Increase the ulimits for non systemd OS
+#   https://docs.mongodb.com/manual/reference/ulimit/
+
+- name: Copy the disable-transparent-hugepages to the host
+  copy:
+    src: disable-transparent-hugepages
+    dest: /etc/init.d/
+    owner: root
+    group: root
+    mode: 0755
+
 - name: Enable service
   become: yes
   systemd:
-    name: mongod
+    name: "{{ item }}"
     enabled: yes
+  with_items:
+    - mongod
+    - disable-transparent-hugepages
 
 - name: Start service
   become: yes
   systemd:
-    name: mongod
+    name: "{{ item }}"
     state: started
+    enabled: yes
+  with_items:
+    - mongod
+    - disable-transparent-hugepages

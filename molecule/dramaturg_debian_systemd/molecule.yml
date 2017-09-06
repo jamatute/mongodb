@@ -6,19 +6,32 @@ driver:
 lint:
   name: yamllint
 platforms:
-  - name: dramaturg_debian_systemd
+  - name: mongod_debian_1
     image: dramaturg/debian-systemd
     privileged: True
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    expose: 27017
+  - name: mongod_debian_2
+    image: dramaturg/debian-systemd
+    privileged: True
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    expose: 27017
+  - name: mongod_debian_3
+    image: dramaturg/debian-systemd
+    privileged: True
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    expose: 27017
 provisioner:
   name: ansible
   lint:
     name: ansible-lint
   options:
-    e: force_docker=yes
+    vv: true
 scenario:
-  name: dramaturg_debian_systemd_mongodb
+  name: mongodb_debian
 verifier:
   name: testinfra
   lint:

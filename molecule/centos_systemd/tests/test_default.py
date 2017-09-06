@@ -66,3 +66,19 @@ def test_template_files_doesnt_exist(host):
     for filename in templates:
         f = host.file(filename)
         assert not f.exists
+
+
+def test_disable_thp(host):
+    f = host.file('/etc/init.d/disable-transparent-hugepages')
+    assert f.exists
+    assert f.user == 'root'
+    assert f.group == 'root'
+    assert oct(f.mode) == '0755'
+
+    f = host.file('/sys/kernel/mm/transparent_hugepage/defrag')
+    assert f.exists
+    assert f.contains('[never]')
+
+    f = host.file('/sys/kernel/mm/transparent_hugepage/enabled')
+    assert f.exists
+    assert f.contains('[never]')

@@ -7,9 +7,6 @@ storage:
   dbPath: {{ mongod.db_path }}
   journal:
     enabled: {{ mongod.journal}}
-processManagement:
-  fork: true
-  pidFilePath: {{ mongod.pid_file }}
 net:
   port: {{ mongod.port }}
 replication:

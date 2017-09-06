@@ -3,9 +3,15 @@
 ---
 all:
   hosts:
-    solita_ubuntu_systemd: &id001
+    mongod_ubuntu_1: &id001
+      ansible_connection: docker
+    mongod_ubuntu_2: &id002
+      ansible_connection: docker
+    mongod_ubuntu_3: &id003
       ansible_connection: docker
 ungrouped:
   hosts:
-    solita_ubuntu_systemd: *id001
+    mongod_ubuntu_1: *id001
+    mongod_ubuntu_2: *id002
+    mongod_ubuntu_3: *id003
   vars: {}

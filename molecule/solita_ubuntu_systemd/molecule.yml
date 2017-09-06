@@ -6,19 +6,32 @@ driver:
 lint:
   name: yamllint
 platforms:
-  - name: solita_ubuntu_systemd
+  - name: mongod_ubuntu_1
     image: solita/ubuntu-systemd
     privileged: True
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    expose: 27017
+  - name: mongod_ubuntu_2
+    image: solita/ubuntu-systemd
+    privileged: True
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    expose: 27017
+  - name: mongod_ubuntu_3
+    image: solita/ubuntu-systemd
+    privileged: True
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    expose: 27017
 provisioner:
   name: ansible
   lint:
     name: ansible-lint
   options:
-    e: force_docker=yes
+    vv: true
 scenario:
-  name: solita_ubuntu_systemd_mongodb
+  name: mongodb_ubuntu
 verifier:
   name: testinfra
   lint:
