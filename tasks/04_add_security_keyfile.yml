@@ -7,10 +7,10 @@
     state: stopped
 
 - name: Generate keyfile
-  local_action:
-    shell: openssl rand -base64 756 > /tmp/security.key
+  local_action: "shell openssl rand -base64 756 > /tmp/security.key"
+  args:
     creates: /tmp/security.key
-  changed_when: false
+  run_once: true
 
 - name: Copy the keyfile in the hosts
   become: true
@@ -22,10 +22,10 @@
     mode: 0600
 
 - name: Delete local file keyfile
-  local_action:
-    file:
-      path: /tmp/security.key
-      state: absent
+  local_action: file
+  args:
+    path: /tmp/security.key
+    state: absent
   changed_when: false
 
 - name: Initial configuration of mongod

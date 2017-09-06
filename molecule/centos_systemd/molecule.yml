@@ -31,7 +31,7 @@ provisioner:
   options:
     vv: true
 scenario:
-  name: centos_systemd_mongodb
+  name: mongodb_centos
 verifier:
   name: testinfra
   lint:

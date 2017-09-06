@@ -1,7 +1,14 @@
 ---
 # tasks file for mongodb
+- name: Test if mongo is installed
+  stat:
+    path: /etc/mongod.conf
+  register: conf_file
+  changed_when: false
+
 - name: Bare mongodb install
   include: 01_mongodb_bare_install.yml
+  when: conf_file.stat.exists == False
 
 - name: Test if replicaset exists
   shell: echo "rs.status()" | mongo --quiet
@@ -11,12 +18,6 @@
   delay: 10
   until: replicaset_exists.rc == 0
   changed_when: false
-
-- name: Show replicaset status
-  debug:
-    var: replicaset_exists
-    verbosity: 2
-  run_once: true
 
 - name: Initiate the replicaset
   include: 02_mongodb_initiate_replicaset.yml
@@ -28,16 +29,23 @@
     echo "db.system.users.find({user:'{{ mongod.admin_user }}'}).count()" |
     mongo --quiet admin
   register: root_user_exists
-  run_once: true
-  retries: 5
+  retries: 8
   delay: 10
   until: root_user_exists.rc == 0
   changed_when: false
+  failed_when: false
+  run_once: true
 
 - name: Create admin user
   include: 03_add_root_user.yml
-  run_once: true
   when: root_user_exists.stdout == '0'
+  run_once: true
 
-# - name: Add security keyfile
-#   include: 04_add_security_keyfile.yml
+- name: Test if the keyfile exists
+  stat:
+    path: "{{ mongod.db_path }}/security.key"
+  register: security_key_file
+
+- name: Add security keyfile
+  include: 04_add_security_keyfile.yml
+  when: security_key_file.stat.exists == False
