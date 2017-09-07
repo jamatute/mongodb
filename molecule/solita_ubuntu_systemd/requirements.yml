@@ -1,2 +1,6 @@
-- src: git+git@git.paradigmadigital.com:ansible/add-deb-repo.git
-  branch: develop
+- src: https://github.com/paradigmadigital/add-deb-repo
+  version: v0.1
+- src: https://github.com/paradigmadigital/thp
+  version: v0.1
+- src: https://github.com/paradigmadigital/add-logrotate-rule
+  version: v0.1
