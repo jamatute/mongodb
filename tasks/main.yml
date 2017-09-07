@@ -24,21 +24,35 @@
   when: "'NoReplicationEnabled' in replicaset_exists.stdout or
          'NotYetInitialized' in replicaset_exists.stdout"
 
-- name: Test if admin user exists
+- name: Test if admin user exists without authentication
   shell: >
-    echo "db.system.users.find({user:'{{ mongod.admin_user }}'}).count()" |
+    echo "rs.slaveOk(); db.system.users.find({user:'{{ mongod.admin_user }}'}).count()" |
     mongo --quiet admin
   register: root_user_exists
-  retries: 8
-  delay: 10
+  retries: 5
+  delay: 20
   until: root_user_exists.rc == 0
   changed_when: false
   failed_when: false
   run_once: true
 
+- name: Test if admin user exists with authentication
+  shell: >
+    echo "rs.slaveOk(); db.system.users.find({user:'{{ mongod.admin_user }}'}).count()" |
+    mongo --quiet admin -u {{ mongod.admin_user }} -p {{ mongod.admin_password }}
+  register: root_user_exists_with_auth
+  retries: 5
+  delay: 20
+  until: root_user_exists_with_auth.rc == 0
+  changed_when: false
+  failed_when: root_user_exists_with_auth.rc == 1
+  run_once: true
+  when: root_user_exists.rc != 0
+
 - name: Create admin user
   include: 03_add_root_user.yml
-  when: root_user_exists.stdout == '0'
+  when: root_user_exists.stdout == '0' or
+        root_user_exists_with_auth.stdout == '0'
   run_once: true
 
 - name: Test if the keyfile exists

@@ -38,19 +38,12 @@ def test_mongod_has_replicaset(host):
 
 
 def test_mongod_has_root_user(host):
-
-    def str2bool(v):
-        return str(v).lower() in ("yes", "true", "t", "1")
-
-    is_master = str2bool(host.check_output(
-        "echo 'rs.isMaster().ismaster' | mongo --quiet"))
-
-    if is_master:
-        has_admin = json.loads(
-            host.check_output(
-                "echo 'db.system.users.find({user: \"admin\"}).count()' " +
-                "| mongo --quiet -u admin -p nimda admin"))
-        assert has_admin == 1
+    has_admin = json.loads(
+        host.check_output(
+            "echo 'rs.slaveOk();" +
+            " db.system.users.find({user: \"admin\"}).count()' " +
+            "| mongo --quiet -u admin -p nimda admin"))
+    assert has_admin == 1
 
 
 def test_mongod_keyfile(host):
