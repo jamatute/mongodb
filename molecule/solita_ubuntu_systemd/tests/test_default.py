@@ -78,7 +78,7 @@ def test_disable_thp(host):
 
 
 def test_logrotate_file(host):
-    f = host.file('/etc/logrotate.d/mongodb.log')
+    f = host.file('/etc/logrotate.d/mongodb.conf')
 
     assert f.exists
     assert f.user == 'root'
