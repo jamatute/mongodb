@@ -1,15 +1,5 @@
 ---
 # tasks file for mongodb_bare_install
-- name: Include vars
-  include_vars: "{{ item }}"
-  with_first_found:
-    - >
-      "{{ ansible_distribution }}-
-      {{ ansible_distribution_major_version | int}}.yml"
-    - "{{ ansible_distribution }}.yml"
-    - "{{ ansible_os_family }}.yml"
-    - "default.yml"
-
 - name: Install mongodb repository in Debian or Ubuntu
   include_role:
     name: add-deb-repo
