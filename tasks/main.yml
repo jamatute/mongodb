@@ -9,8 +9,6 @@
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
     - "default.yml"
-- name: debug
-  debug: var=program_name
 
 - name: Test if mongo is installed
   stat:
@@ -41,7 +39,8 @@
   until: replicaset_exists_with_auth.rc == 0
   changed_when: false
   run_once: true
-  when: replicaset_exists.rc != 0
+  when: "replicaset_exists.rc != 0 or
+        'Unauthorized' in replicase_exists.stdout"
 
 - name: Initiate the replicaset
   include: 02_mongodb_initiate_replicaset.yml

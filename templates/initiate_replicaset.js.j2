@@ -3,7 +3,7 @@ config = {
     members : [
     {% for ip in mongodb_ips %}
       {% if loop.index == 1 %}
-        {_id : {{ loop.index - 1 }},host: "{{ ip }}:{{mongod.port}}"}
+        {_id : {{ loop.index - 1 }}, host: "{{ ip }}:{{mongod.port}}"}
       {% else %}
         ,{_id : {{ loop.index - 1 }}, host: "{{ ip }}:{{mongod.port}}"}
       {% endif %}

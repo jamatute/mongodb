@@ -15,10 +15,7 @@
 
 - name: Save ips to a variable
   set_fact:
-    mongodb_ips: >
-      "{{ ansible_play_hosts |
-          map('extract', hostvars, ['ansible_default_ipv4', 'address']) |
-          join(',') }}"
+    mongodb_ips: "{{ ansible_play_hosts | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
   run_once: true
   when: ansible_connection != "docker"
 
@@ -33,7 +30,6 @@
     src: initiate_replicaset.js.j2
     dest: /tmp/replicaset.js
   run_once: true
-  changed_when: false
 
 - name: Initiate the replicaset
   command: mongo /tmp/replicaset.js

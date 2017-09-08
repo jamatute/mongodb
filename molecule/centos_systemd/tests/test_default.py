@@ -75,3 +75,11 @@ def test_disable_thp(host):
     f = host.file('/sys/kernel/mm/transparent_hugepage/enabled')
     assert f.exists
     assert f.contains('[never]')
+
+
+def test_logrotate_file(host):
+    f = host.file('/etc/logrotate.d/mongodb.log')
+
+    assert f.exists
+    assert f.user == 'root'
+    assert f.group == 'root'
