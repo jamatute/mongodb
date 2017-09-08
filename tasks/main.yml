@@ -63,3 +63,7 @@
 - name: Add security keyfile
   include: 04_add_security_keyfile.yml
   when: security_key_file.stat.exists == False
+
+- name: Configure logrotate
+  include_role:
+    name: add-logrotate-rule
