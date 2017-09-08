@@ -4,12 +4,7 @@ Install mongodb with replicasets
 
 ## Requirements
 
-If you don't specify the admin password for mongodb you'll need `passlib`
-installed.
-
-```bash
-pip install passlib
-```
+None
 
 ## Role Variables
 
@@ -26,7 +21,11 @@ pip install passlib
 
 ## Dependencies
 
-Not yet
+To install the dependencies run:
+
+```bash
+ansible-galaxy install -r requirements.yml
+```
 
 ## Example playbook
 
@@ -34,6 +33,14 @@ Not yet
 - hosts: all
   roles:
     - mongodb
+```
+
+## Testing
+
+To test the role you need [molecule](http://molecule.readthedocs.io/en/latest/).
+
+```bash
+molecule test --all
 ```
 
 ## License

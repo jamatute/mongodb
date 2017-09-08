@@ -10,3 +10,7 @@ mongod:
   keyfile: /data/security.key
   admin_user: admin
   admin_password: nimda
+
+# defaults file for add-logrotate-rule
+program_name: mongodb
+log_path: "{{ mongod.log_path }}"
