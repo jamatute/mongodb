@@ -1,5 +1,11 @@
 ---
 # tasks file for mongodb_bare_install
+- name: Test if mongo is installed
+  stat:
+    path: /etc/mongod.conf
+  register: conf_file
+  changed_when: false
+
 - name: Install mongodb repository in Debian or Ubuntu
   include_role:
     name: add-deb-repo
@@ -37,17 +43,14 @@
     src: mongod.conf.j2
     dest: /etc/mongod.conf
     mode: 0644
+  when: conf_file.stat.exists == False
 
 # - name: Increase the ulimits for non systemd OS
 #   https://docs.mongodb.com/manual/reference/ulimit/
 
 - name: Copy the disable-transparent-hugepages to the host
-  copy:
-    src: disable-transparent-hugepages
-    dest: /etc/init.d/
-    owner: root
-    group: root
-    mode: 0755
+  include_role:
+    name: thp
 
 - name: Enable service
   become: yes
@@ -56,7 +59,6 @@
     enabled: yes
   with_items:
     - mongod
-    - disable-transparent-hugepages
 
 - name: Start service
   become: yes
@@ -66,4 +68,3 @@
     enabled: yes
   with_items:
     - mongod
-    - disable-transparent-hugepages
