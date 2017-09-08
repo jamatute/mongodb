@@ -9,7 +9,7 @@
   include: centos.yml
   when: >
     ansible_distribution == 'CentOS' or
-    ansible_distribution == 'Red Hat Enterprise Linux'
+    ansible_distribution == 'RedHat'
 
 - name: Install mongodb packages
   become: yes
