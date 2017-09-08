@@ -48,7 +48,7 @@
 # - name: Increase the ulimits for non systemd OS
 #   https://docs.mongodb.com/manual/reference/ulimit/
 
-- name: Copy the disable-transparent-hugepages to the host
+- name: Disable Transparent Hugepages
   include_role:
     name: thp
 

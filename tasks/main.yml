@@ -10,15 +10,8 @@
     - "{{ ansible_os_family }}.yml"
     - "default.yml"
 
-- name: Test if mongo is installed
-  stat:
-    path: /etc/mongod.conf
-  register: conf_file
-  changed_when: false
-
 - name: Bare mongodb install
   include: 01_mongodb_bare_install.yml
-  # when: conf_file.stat.exists == False
 
 - name: Test if replicaset exists
   shell: echo "rs.status()" | mongo --quiet
@@ -36,11 +29,15 @@
   run_once: true
   retries: 5
   delay: 10
-  until: replicaset_exists_with_auth.rc == 0
+  until: "replicaset_exists_with_auth.rc == 0 and
+         ('NoReplicationEnabled' not in replicaset_exists.stdout or
+         'NotYetInitialized' not in replicaset_exists.stdout or
+         'NoReplicationEnabled' not in replicaset_exists_with_auth.stdout or
+         'NotYetInitialized' not in replicaset_exists_with_auth.stdout)"
+
   changed_when: false
-  run_once: true
   when: "replicaset_exists.rc != 0 or
-        'Unauthorized' in replicase_exists.stdout"
+        'Unauthorized' in replicaset_exists.stdout"
 
 - name: Initiate the replicaset
   include: 02_mongodb_initiate_replicaset.yml
@@ -64,7 +61,7 @@
 - name: Test if admin user exists with authentication
   shell: >
     echo "rs.slaveOk(); db.system.users.find({user:'{{ mongod.admin_user }}'}).count()" |
-    mongo --quiet admin -u {{ mongod.admin_user }} -p {{ mongod.admin_password }}
+    mongo --quiet admin -u {{ mongod.admin_user }} -p '{{ mongod.admin_password }}'
   register: root_user_exists_with_auth
   retries: 5
   delay: 20
