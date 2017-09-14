@@ -1,3 +1,5 @@
+- src: https://github.com/paradigmadigital/add-deb-repo
+  version: v0.1
 - src: https://github.com/paradigmadigital/thp
   version: v0.2
 - src: https://github.com/paradigmadigital/add-logrotate-rule
