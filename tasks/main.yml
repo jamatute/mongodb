@@ -1,0 +1,93 @@
+---
+# tasks file for mongodb
+- name: Include vars
+  include_vars: "{{ item }}"
+  with_first_found:
+    - >
+      "{{ ansible_distribution }}-
+      {{ ansible_distribution_major_version | int}}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "default.yml"
+
+- name: Bare mongodb install
+  include: 01_mongodb_bare_install.yml
+
+- name: Test if replicaset exists
+  shell: echo "rs.status()" | mongo --quiet
+  register: replicaset_exists
+  run_once: true
+  retries: 5
+  delay: 10
+  until: replicaset_exists.rc == 0
+  changed_when: false
+  failed_when: false
+
+- name: Test if replicaset exists with authentication
+  shell: echo "rs.status()" | mongo --quiet
+  register: replicaset_exists_with_auth
+  run_once: true
+  retries: 5
+  delay: 10
+  until: "replicaset_exists_with_auth.rc == 0 and
+         ('NoReplicationEnabled' not in replicaset_exists.stdout or
+         'NotYetInitialized' not in replicaset_exists.stdout or
+         'NoReplicationEnabled' not in replicaset_exists_with_auth.stdout or
+         'NotYetInitialized' not in replicaset_exists_with_auth.stdout)"
+
+  changed_when: false
+  when: "replicaset_exists.rc != 0 or
+        'Unauthorized' in replicaset_exists.stdout"
+
+- name: Initiate the replicaset
+  include: 02_mongodb_initiate_replicaset.yml
+  when: "'NoReplicationEnabled' in replicaset_exists.stdout or
+         'NotYetInitialized' in replicaset_exists.stdout or
+         'NoReplicationEnabled' in replicaset_exists_with_auth.stdout or
+         'NotYetInitialized' in replicaset_exists_with_auth.stdout"
+
+- name: Test if admin user exists without authentication
+  shell: >
+    echo "rs.slaveOk(); db.system.users.find({user:'{{ mongod.admin_user }}'}).count()" |
+    mongo --quiet admin
+  register: root_user_exists
+  retries: 5
+  delay: 20
+  until: root_user_exists.rc == 0
+  changed_when: false
+  failed_when: false
+  run_once: true
+
+- name: Test if admin user exists with authentication
+  shell: >
+    echo "rs.slaveOk(); db.system.users.find({user:'{{ mongod.admin_user }}'}).count()" |
+    mongo --quiet admin -u {{ mongod.admin_user }} -p '{{ mongod.admin_password }}'
+  register: root_user_exists_with_auth
+  retries: 5
+  delay: 20
+  until: root_user_exists_with_auth.rc == 0
+  changed_when: false
+  failed_when: root_user_exists_with_auth.rc == 1
+  run_once: true
+  when: root_user_exists.rc != 0
+
+- name: Create admin user
+  include: 03_add_root_user.yml
+  when: root_user_exists.stdout == '0' or
+        ( root_user_exists_with_auth.stdout is defined and
+        root_user_exists_with_auth.stdout == '0')
+  run_once: true
+
+- name: Test if the keyfile exists
+  become: true
+  stat:
+    path: "{{ mongod.db_path }}/security.key"
+  register: security_key_file
+
+- name: Add security keyfile
+  include: 04_add_security_keyfile.yml
+  when: security_key_file.stat.exists == False
+
+- name: Configure logrotate
+  include_role:
+    name: add-logrotate-rule

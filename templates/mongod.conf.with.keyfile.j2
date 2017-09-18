@@ -1,0 +1,15 @@
+systemLog:
+  destination: file
+  logAppend: true
+  path: {{ mongod.log_path }}
+  logRotate: reopen
+storage:
+  dbPath: {{ mongod.db_path }}
+  journal:
+    enabled: {{ mongod.journal}}
+net:
+  port: {{ mongod.port }}
+replication:
+  replSetName: main_replicaset
+security:
+   keyFile: {{ mongod.db_path }}/security.key

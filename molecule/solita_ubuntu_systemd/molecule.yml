@@ -1,0 +1,38 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint:
+  name: yamllint
+platforms:
+  - name: mongod_ubuntu_1
+    image: solita/ubuntu-systemd
+    privileged: True
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    expose: 27017
+  - name: mongod_ubuntu_2
+    image: solita/ubuntu-systemd
+    privileged: True
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    expose: 27017
+  - name: mongod_ubuntu_3
+    image: solita/ubuntu-systemd
+    privileged: True
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    expose: 27017
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  options:
+    vv: true
+scenario:
+  name: mongodb_ubuntu
+verifier:
+  name: testinfra
+  lint:
+    name: flake8

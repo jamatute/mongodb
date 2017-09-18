@@ -1,0 +1,17 @@
+# Molecule managed
+
+---
+all:
+  hosts:
+    mongod_debian_1: &id001
+      ansible_connection: docker
+    mongod_debian_2: &id002
+      ansible_connection: docker
+    mongod_debian_3: &id003
+      ansible_connection: docker
+ungrouped:
+  hosts:
+    mongod_debian_1: *id001
+    mongod_debian_2: *id002
+    mongod_debian_3: *id003
+  vars: {}

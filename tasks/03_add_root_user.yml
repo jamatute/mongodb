@@ -1,0 +1,21 @@
+---
+# tasks file for 03_add_root_user
+- name: Copy the user creation script
+  template:
+    src: create_root_user.js.j2
+    dest: /tmp/create_root.js
+  changed_when: false
+
+- name: Create the user
+  command: mongo /tmp/create_root.js
+  when: true
+  retries: 5
+  register: result
+  delay: 10
+  until: result.rc == 0
+
+- name: Delete the create user script
+  file:
+    path: /tmp/create_root.js
+    state: absent
+  changed_when: false

@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    program_name: mongodb
+  roles:
+    - role: mongodb

@@ -1,0 +1,42 @@
+---
+# tasks file for 04_add_security_keyfile
+- name: Stop the mongo service
+  become: true
+  systemd:
+    name: mongod
+    state: stopped
+
+- name: Generate keyfile
+  local_action: "shell openssl rand -base64 756 > /tmp/security.key"
+  args:
+    creates: /tmp/security.key
+  run_once: true
+
+- name: Copy the keyfile in the hosts
+  become: true
+  copy:
+    src: /tmp/security.key
+    dest: "{{ mongod.db_path }}/security.key"
+    owner: "{{ mongodb_user }}"
+    group: "{{ mongodb_user }}"
+    mode: 0600
+
+- name: Delete local file keyfile
+  local_action: file
+  args:
+    path: /tmp/security.key
+    state: absent
+  changed_when: false
+
+- name: Initial configuration of mongod
+  become: yes
+  template:
+    src: mongod.conf.with.keyfile.j2
+    dest: /etc/mongod.conf
+    mode: 0644
+
+- name: Restart the mongo service
+  become: true
+  systemd:
+    name: mongod
+    state: started

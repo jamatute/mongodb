@@ -1,0 +1,13 @@
+db=db.getSiblingDB('admin');
+db.createUser(
+  {
+    user:'{{ mongod.admin_user | default('root')}}',
+    pwd:"{{ mongod.admin_password }}",
+    roles:[
+      {
+        db:'admin',
+        role:'root'
+      }
+    ]
+  }
+);

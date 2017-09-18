@@ -1,0 +1,70 @@
+---
+# tasks file for mongodb_bare_install
+- name: Test if mongo is installed
+  stat:
+    path: /etc/mongod.conf
+  register: conf_file
+  changed_when: false
+
+- name: Install mongodb repository in Debian or Ubuntu
+  include_role:
+    name: add-deb-repo
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install mongodb repository in CentOS or Redhat
+  include: centos.yml
+  when: >
+    ansible_distribution == 'CentOS' or
+    ansible_distribution == 'RedHat'
+
+- name: Install mongodb packages
+  become: yes
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ mongodb_packages }}"
+
+- name: Create necessary directories
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ mongodb_user }}"
+    group: "{{ mongodb_user }}"
+    mode: 0755
+  with_items:
+    - "{{ mongod.db_path }}"
+    - "{{ mongod.log_path | dirname }}"
+    - "{{ mongod.pid_file | dirname }}"
+
+- name: Initial configuration of mongod
+  become: yes
+  template:
+    src: mongod.conf.j2
+    dest: /etc/mongod.conf
+    mode: 0644
+  when: conf_file.stat.exists == False
+
+# - name: Increase the ulimits for non systemd OS
+#   https://docs.mongodb.com/manual/reference/ulimit/
+
+- name: Disable Transparent Hugepages
+  include_role:
+    name: thp
+
+- name: Enable service
+  become: yes
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+  with_items:
+    - mongod
+
+- name: Start service
+  become: yes
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - mongod
